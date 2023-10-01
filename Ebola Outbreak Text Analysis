@@ -1,0 +1,140 @@
+
+## Shreya Joshi
+## TEXT ANALYSIS
+
+rm(list=ls())
+cat("\014")
+# set working directory
+setwd("~/Documents/BA_with_R")
+save.image("~/Documents/BA_with_R/shreyajoshi")
+library(tm)  # Text Mining Package
+#install.packages("lsa")
+library(lsa)  # Latent semantic analysis
+library(topicmodels)  # topic model
+library(wordcloud)
+library(e1071)  # Functions for support vector machines, etc.
+library(SnowballC)  # An R interface that implements Porter's word stemming algorithm for collapsing words to a common root 
+library(caret)  # Classification And REgression Training) is a set of functions that streamlines the process for creating predictive models
+
+######### Q 1 -- Constructing Corpus  
+# (1) define a vector of sentences/documents
+
+# convert sentences into a corpus
+mycorpus <- Corpus(DirSource("~/Documents/BA_with_R/ebola")) 
+
+### Q2 : Defining Stop words
+
+# define customized stopwords
+mystop <- c('ebola', 'replacemovietitlewithebola'
+            , 'http', 'https', '“', '”', 'amp', 'via',
+            'don', 'dont')
+
+# define the text cleaning process
+dtm.control = list(tolower=T, removePunctuation=T, removeNumbers=T, stopwords=c(stopwords("english"), mystop), 
+                   stripWhitespace=T, stemming=T)
+# generate document-term matrix
+dtm.full <- DocumentTermMatrix(mycorpus, control=dtm.control)  
+inspect(dtm.full)
+
+### Q3 :Creating DTM
+
+# remove terms occurring in less than 2% of the documents
+dtm <- removeSparseTerms(dtm.full, 0.8)  
+dim(dtm.full)  #62443 words
+dim(dtm)  # 7747 words
+
+
+### Q4. (1 pt) Plot a word cloud showing the 30 most frequent terms in the corpus. Note. If you
+#see the following warning message when using wordcloud(), you can resize the “Plots”
+#window so that the canvas will fit all the words.
+
+
+# sum of occurrences of a term across all documents
+freq <- colSums( as.matrix(dtm) )
+# sort frequency
+freq.sorted <- sort( freq, decreasing = TRUE )
+freq.sorted[1:30]  # the 30 most frequently terms of the corpus
+
+
+#install.packages("wordcloud")
+library(wordcloud)
+
+# 30 words to be plotted 
+wordcloud(names(freq.sorted), freq.sorted, max.words=30, colors=brewer.pal(7, "Set1"))
+
+# set rot.per = 0.2 to have 20% words with 90 degree rotation
+wordcloud(names(freq.sorted), freq.sorted, max.words = 30, colors=brewer.pal(7, "Set1"), 
+          rot.per=0.2)
+
+#5. (4 pt) Estimate LDA with 10 topics, retrieve the posterior topics and terms.
+#a. For each document, identify the dominant topics.
+#b. Corresponding to each dominant topic, plot a word cloud to show the 30 terms
+#with the highest probabilities. You may check the following websites and see if
+#the derived topics make sense.
+
+###################################################
+###### Topic Modeling about Doctor Reviews #######
+###################################################
+
+
+
+
+# Estimate the LDA model 
+# LDA(x, k): x is a document term matrix, k is the # of topics
+set.seed(123)
+lda.model = LDA(dtm[1:14,], 10) # use the first 14 documents about dentists
+
+# get the posterior probabilities of the model
+myposterior <- posterior(lda.model) 
+
+# TOPIC distribution in each DOCUMENT, each row is a document, each column is a topic
+topics = myposterior$topics 
+
+# TERM distribution in each TOPIC, each row is a topic, each column is to a term
+terms = myposterior$terms
+
+
+### Q5.B) word cloud for each dominant topics
+
+# Plot word cloud for a specific topic
+set.seed(123)
+
+tid <- 1 # topic id, it can be 1, ... k you specified in LDA(dtm, k)
+freq <- terms[tid, ] # the probability of each term in a given topic
+wordcloud(names(freq), freq, max.words=30, colors=brewer.pal(6,"Dark2"))
+
+tid <- 2 # topic id, it can be 1, ... k you specified in LDA(dtm, k)
+freq <- terms[tid, ] # the probability of each term in a given topic
+wordcloud(names(freq), freq, max.words=30, colors=brewer.pal(6,"Dark2"))
+
+tid <- 3 # topic id, it can be 1, ... k you specified in LDA(dtm, k)
+freq <- terms[tid, ] # the probability of each term in a given topic
+wordcloud(names(freq), freq, max.words=30, colors=brewer.pal(6,"Dark2"))
+
+tid <- 4 # topic id, it can be 1, ... k you specified in LDA(dtm, k)
+freq <- terms[tid, ] # the probability of each term in a given topic
+wordcloud(names(freq), freq, max.words=30, colors=brewer.pal(6,"Dark2"))
+
+tid <- 5 # topic id, it can be 1, ... k you specified in LDA(dtm, k)
+freq <- terms[tid, ] # the probability of each term in a given topic
+wordcloud(names(freq), freq, max.words=30, colors=brewer.pal(6,"Dark2"))
+
+tid <- 6 # topic id, it can be 1, ... k you specified in LDA(dtm, k)
+freq <- terms[tid, ] # the probability of each term in a given topic
+wordcloud(names(freq), freq, max.words=30, colors=brewer.pal(6,"Dark2"))
+
+tid <- 7 # topic id, it can be 1, ... k you specified in LDA(dtm, k)
+freq <- terms[tid, ] # the probability of each term in a given topic
+wordcloud(names(freq), freq, max.words=30, colors=brewer.pal(6,"Dark2"))
+
+tid <- 8 # topic id, it can be 1, ... k you specified in LDA(dtm, k)
+freq <- terms[tid, ] # the probability of each term in a given topic
+wordcloud(names(freq), freq, max.words=30, colors=brewer.pal(6,"Dark2"))
+
+tid <- 9 # topic id, it can be 1, ... k you specified in LDA(dtm, k)
+freq <- terms[tid, ] # the probability of each term in a given topic
+wordcloud(names(freq), freq, max.words=30, colors=brewer.pal(6,"Dark2"))
+
+tid <- 10 # topic id, it can be 1, ... k you specified in LDA(dtm, k)
+freq <- terms[tid, ] # the probability of each term in a given topic
+wordcloud(names(freq), freq, max.words=30, colors=brewer.pal(6,"Dark2"))
